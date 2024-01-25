@@ -13,10 +13,51 @@ const mapOperators = {
 
 const displayArea = document.querySelector(".display");
 const buttons = document.querySelectorAll(".num");
+const op_sign = document.querySelectorAll(".op-sign");
 const clearButton = document.querySelector(".clear");
 const deleteButton = document.querySelector(".del");
 
 buttons.forEach(button => {
+    button.addEventListener('click', () => {
+        if (displayContent === "" && button.textContent === "-") {
+            displayContent += button.textContent
+            displayArea.textContent = displayContent;
+        } else if (button.textContent in mapOperators || button.textContent === "=") {
+            if (button.textContent in mapOperators) currentOperator = button.textContent;
+            displayArea.textContent = "";
+
+            if (!isNaN(displayContent) && !isNaN(parseFloat(displayContent))) {
+                operand = displayContent;
+                operandStack.push(operand);
+            }
+            
+            if (!(currentOperator in mapOperators)) {
+                displayArea.textContent = "Error!";
+                return;
+            };
+            if (operandStack.length == 2) {
+                let b = parseFloat(operandStack.pop());
+                let a = parseFloat(operandStack.pop());
+                let ans = operate(currentOperator, a, b);
+                if (ans === "Error!") {
+                    displayArea.textContent = ans;
+                    return;
+                } 
+                operandStack.push(ans);
+                if (String(ans).length > 3) displayArea.textContent = ans.toFixed(2);
+                else displayArea.textContent = ans;
+            }
+
+            if (button.textContent === "=") currentOperator = "";
+            displayContent = "";
+        } else {
+            displayContent += button.textContent
+            displayArea.textContent = displayContent;
+        }
+    });
+});
+
+op_sign.forEach(button => {
     button.addEventListener('click', () => {
         if (displayContent === "" && button.textContent === "-") {
             displayContent += button.textContent
